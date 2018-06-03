@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Wallet Generator - Example - Bitcoin Utility Belt</title>
+    <style>
+      .results{
+        text-align: center;
+        display: none;
+      }
+      .address, .pk{
+        word-wrap: break-word;
+        margin-top: 1rem;
+      }
+      .column {
+        margin-top: 1rem;
+      }
+      .qrcode img{
+        margin:  auto;
+      }
+      .btn-primary{
+        width:  100%;
+      }
+    </style>
+  </head>
+  <body>
+    <section>
+      <div class="container">
+        <h1>Wallet Generator</h1>
+
+        <form id="walletForm">
+          <div class="form-group">
+            
+              <!-- options -->
+              <div class="options">
+              <!-- wallet type -->
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <label class="input-group-text" for="walletType">Wallet Type</label>
+                </div>
+                <select class="custom-select" id="walletType">
+                  <option value="P2PKH" selected>P2PKH</option>
+                  <option value="P2SH">P2SH</option>
+                  <option value="P2WPKH">P2WPKH</option>
+                  <option value="P2WSH">P2WSH</option>
+                </select>
+              </div>
+
+              <!-- network -->
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <label class="input-group-text" for="networkType">Network</label>
+                </div>
+                <select class="custom-select" id="networkType">
+                  <option value="mainnet" selected>Bitcoin Mainnet</option>
+                  <option value="testnet">Bitcoin Testnet</option>
+                </select>
+              </div>
+
+              </div>
+
+              <!-- submit -->
+              <input class="btn btn-primary" type="submit" value="Create Wallet">
+
+              <!-- results -->
+              <div class="results container">
+                <div class="row">
+                  <div class="col-md-6 column">
+                    <h2>Address</h2>
+                    <div class="qrcode" id="addressQrCode"></div>
+                    <div class="address"></div>
+                  </div>
+                  <div class="col-md-6 column">
+                    <h2>Private Key</h2>
+                    <div class="qrcode" id="pkQrCode"></div>
+                    <div class="pk"></div>
+                  </div>
+                </div>
+              </div>
+          </div>          
+        </form>
+      </div>
+    </section>
+
+    <!-- Importing Bitcoin Utility Belt script -->
+    <script src="js/bitcoin-utility-belt.min.js"></script>
+    <script src="js/qrcode.min.js"></script>
+    
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <script>
+
+      // get wallet type
+      var walletType = $("#walletType").val();
+      $("#walletType").change(function(){
+        walletType = this.value;
+      });
+
+      // get network type
+      var walletNetwork = $("#networkType").val();
+      $("#networkType").change(function(){
+        walletNetwork = this.value;
+      });
+
+      // create wallet
+      $("#walletForm").submit(function(e){
+        e.preventDefault();
+
+        let testnet = false;
+        if(walletNetwork == "testnet"){
+          testnet = true;
+        }
+
+        wallet = belt.wallet.create(walletType, testnet);
+
+        $(".results .address").html(wallet.address);
+        $(".results .pk").html(wallet.privateKey);
+
+        // qrcode
+        $("#addressQrCode").html("");
+        var qrcode = new QRCode(document.getElementById("addressQrCode"), {
+          text: wallet.address,
+          width: 128,
+          height: 128
+        });
+        $("#pkQrCode").html("");
+        var qrcode = new QRCode(document.getElementById("pkQrCode"), {
+          text: wallet.privateKey,
+          width: 128,
+          height: 128
+        });
+        $(".results").show();
+      });
+
+    </script>
+  </body>
+</html>
