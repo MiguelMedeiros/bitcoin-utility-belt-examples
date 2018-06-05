@@ -1,0 +1,27 @@
+.results{
+  text-align: center;
+  display: none;
+}
+.address, .pk{
+  word-wrap: break-word;
+  margin-top: 1rem;
+}
+.column {
+  margin-top: 1rem;
+}
+.qrcode img{
+  margin: 1rem auto;
+}
+.btn-primary{
+  width:  100%;
+}
+#printWallet{
+  margin-top: 1rem;
+}
+.error-message{
+  display: none;
+  margin: 1rem;
+  text-align: center;
+  font-weight: bold;
+  color: red;
+}

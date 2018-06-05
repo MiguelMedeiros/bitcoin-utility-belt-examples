@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/styles.css">
+
+    <title>Brain Wallet Generator - Example - Bitcoin Utility Belt</title>
+
+  </head>
+  <body>
+    <section>
+      <div class="container">
+        <h1>Brain Wallet Generator</h1>
+
+        <form id="walletForm">
+          <div class="form-group">
+            
+              <!-- options -->
+              <div class="options">
+                <!-- wallet type -->
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <label class="input-group-text" for="walletType">Wallet Type</label>
+                  </div>
+                  <select class="custom-select" id="walletType">
+                    <option value="P2PKH" selected>P2PKH - Pay to Public Key Hash (legacy)</option>
+                    <option value="P2WPKH">P2WPKH - Pay to Witness Public Key Hash (segwit)</option>
+                    <option value="P2SH">P2SH - Pay to Script Hash</option>
+                    <option value="P2WSH">P2WSH - Pay to Witness Script Hash</option>
+                  </select>
+                </div>
+
+                <!-- network -->
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <label class="input-group-text" for="networkType">Network</label>
+                  </div>
+                  <select class="custom-select" id="networkType">
+                    <option value="mainnet" selected>Bitcoin Mainnet</option>
+                    <option value="testnet">Bitcoin Testnet</option>
+                  </select>
+                </div>
+
+                <!-- passphrase -->
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" >Passphrase</span>
+                  </div>
+                  <input type="password" class="form-control" aria-label="Default" id="passphrase" >
+                </div>
+
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" >Confirm Passphrase</span>
+                  </div>
+                  <input type="password" class="form-control" aria-label="Default" id="passphrase2" >
+                </div>
+                <div class="error-message"></div>
+              </div>
+
+              <!-- submit -->
+              <button class="btn btn-primary" type="submit" ><i class="fas fa-wallet"></i> Create Wallet</button>
+
+          </div>          
+        </form>
+
+        <!-- results -->
+        <div class="results container">
+          <div class="row">
+            <div class="col-md-6 column">
+              <h2>Address<br/><i class="far fa-eye"></i></h2>
+              <div class="qrcode" id="addressQrCode"></div>
+              <div class="address"></div>
+            </div>
+            <div class="col-md-6 column">
+              <h2>Private Key<br/><i class="far fa-eye-slash"></i></h2>
+              <div class="qrcode" id="pkQrCode"></div>
+              <div class="pk"></div>
+            </div>
+            <div class="col-md-12 column">
+              <!-- print -->
+              <button class="btn btn-secondary" id="printWallet"><i class="fas fa-print"></i> Print Wallet</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Importing Bitcoin Utility Belt script -->
+    <script src="js/bitcoin-utility-belt.min.js"></script>
+    <script src="js/qrcode.min.js"></script>
+    
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <script>
+
+      // get wallet type
+      var walletType = $("#walletType").val();
+      $("#walletType").change(function(){
+        walletType = this.value;
+      });
+
+      // get network type
+      var walletNetwork = $("#networkType").val();
+      $("#networkType").change(function(){
+        walletNetwork = this.value;
+      });
+
+      // create wallet
+      $("#walletForm").submit(function(e){
+        e.preventDefault();
+
+        let testnet = false;
+        if(walletNetwork == "testnet"){
+          testnet = true;
+        }
+
+        let passphrase = $("#passphrase").val();
+        let passphrase2 = $("#passphrase2").val();
+
+        if(passphrase == passphrase2){
+          if(passphrase != ""){
+            wallet = belt.wallet.createBrainWallet(passphrase, walletType, testnet);
+
+            $(".results .address").html(wallet.address);
+            $(".results .pk").html(wallet.privateKey);
+
+            // qrcode
+            $("#addressQrCode").html("");
+            var qrcode = new QRCode(document.getElementById("addressQrCode"), {
+              text: wallet.address,
+              width: 128,
+              height: 128
+            });
+            $("#pkQrCode").html("");
+            var qrcode = new QRCode(document.getElementById("pkQrCode"), {
+              text: wallet.privateKey,
+              width: 128,
+              height: 128
+            });
+            $(".results").show();
+            $(".error-message").hide();
+            $("#passphrase").removeClass("is-invalid");
+            $("#passphrase2").removeClass("is-invalid");
+          }else{
+            $(".error-message").show();
+            $(".results").hide();
+            $("#passphrase").addClass("is-invalid");
+            $("#passphrase2").addClass("is-invalid");
+            $(".error-message").html("Error: blank passphrases!");
+          }
+        }else{
+          $(".error-message").show();
+          $(".results").hide();
+          $("#passphrase").addClass("is-invalid");
+          $("#passphrase2").addClass("is-invalid");
+          $(".error-message").html("Error: passphrases don't match!");
+        }
+      });
+
+      //print
+      $("#printWallet").click(function(){
+        print();
+      });
+    </script>
+  </body>
+</html>

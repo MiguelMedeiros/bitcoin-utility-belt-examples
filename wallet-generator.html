@@ -6,28 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/styles.css">
 
     <title>Wallet Generator - Example - Bitcoin Utility Belt</title>
-    <style>
-      .results{
-        text-align: center;
-        display: none;
-      }
-      .address, .pk{
-        word-wrap: break-word;
-        margin-top: 1rem;
-      }
-      .column {
-        margin-top: 1rem;
-      }
-      .qrcode img{
-        margin:  auto;
-      }
-      .btn-primary{
-        width:  100%;
-      }
-    </style>
+
   </head>
   <body>
     <section>
@@ -45,10 +29,10 @@
                   <label class="input-group-text" for="walletType">Wallet Type</label>
                 </div>
                 <select class="custom-select" id="walletType">
-                  <option value="P2PKH" selected>P2PKH</option>
-                  <option value="P2SH">P2SH</option>
-                  <option value="P2WPKH">P2WPKH</option>
-                  <option value="P2WSH">P2WSH</option>
+                  <option value="P2PKH" selected>P2PKH - Pay to Public Key Hash (legacy)</option>
+                  <option value="P2WPKH">P2WPKH - Pay to Witness Public Key Hash (segwit)</option>
+                  <option value="P2SH">P2SH - Pay to Script Hash</option>
+                  <option value="P2WSH">P2WSH - Pay to Witness Script Hash</option>
                 </select>
               </div>
 
@@ -66,25 +50,30 @@
               </div>
 
               <!-- submit -->
-              <input class="btn btn-primary" type="submit" value="Create Wallet">
+              <button class="btn btn-primary" type="submit" ><i class="fas fa-wallet"></i> Create Wallet</button>
 
-              <!-- results -->
-              <div class="results container">
-                <div class="row">
-                  <div class="col-md-6 column">
-                    <h2>Address</h2>
-                    <div class="qrcode" id="addressQrCode"></div>
-                    <div class="address"></div>
-                  </div>
-                  <div class="col-md-6 column">
-                    <h2>Private Key</h2>
-                    <div class="qrcode" id="pkQrCode"></div>
-                    <div class="pk"></div>
-                  </div>
-                </div>
-              </div>
           </div>          
         </form>
+
+        <!-- results -->
+        <div class="results container">
+          <div class="row">
+            <div class="col-md-6 column">
+              <h2>Address<br/><i class="far fa-eye"></i></h2>
+              <div class="qrcode" id="addressQrCode"></div>
+              <div class="address"></div>
+            </div>
+            <div class="col-md-6 column">
+              <h2>Private Key<br/><i class="far fa-eye-slash"></i></h2>
+              <div class="qrcode" id="pkQrCode"></div>
+              <div class="pk"></div>
+            </div>
+            <div class="col-md-12 column">
+              <!-- print -->
+              <button class="btn btn-secondary" id="printWallet"><i class="fas fa-print"></i> Print Wallet</button>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -142,6 +131,10 @@
         $(".results").show();
       });
 
+      //print
+      $("#printWallet").click(function(){
+        print();
+      });
     </script>
   </body>
 </html>
