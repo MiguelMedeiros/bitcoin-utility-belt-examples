@@ -25,3 +25,10 @@
   font-weight: bold;
   color: red;
 }
+
+
+@media print{
+  .no-print{
+    display: none;
+  }
+}
